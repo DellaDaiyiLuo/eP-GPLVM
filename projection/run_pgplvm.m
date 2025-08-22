@@ -20,7 +20,7 @@ if (size(tgrid,1)~=nt)||(size(yy,1)~=nt)||(size(xx,1)~=nt)
     error(['Dimensions are incongruent! tgrid, xx, and yy should have ' num2str(nt) ' rows.'])
 end
     
-    
+setopt.ng_iter = 1; % DL: 1. start from coarser xgrid, 0. same xgrid   
 setopt.tgrid = tgrid;
 setopt.latentTYPE = 1; % kernel for the latent variable, 1. AR1, 2. SE
 
@@ -33,11 +33,11 @@ ffmat = sqrt(yy);
 if isempty(xppca)
     xppca = pca(ffmat,nf);
 end
-setopt.xplds = xppca;%[xx xx];%xx; % %for initialization purpose
+setopt.xplds = xppca;% for initialization purpose
 
 if nf==1
     xppcamat = align_xtrue(xppca,xx);
-    setopt.xpldsmat = xppcamat;%[xx xx]; %xx; %  for plotting purpose
+    setopt.xpldsmat = xppcamat;% for plotting purpose
 end
 
 %% == 2. Compute P-GPLVM ====
@@ -59,6 +59,9 @@ setopt.la_flag = 3; % 1. no la; 2. standard la; 3. decoupled la
 setopt.hypid = [1,2,3,4]; % 1. rho for Kxx; 2. len for Kxx; 3. rho for Kff; 4. len for Kff; 5. sigma2 (annealing it instead of optimizing it)
 setopt.niter = niter; % number of iterations
 setopt.ffmat = ffmat;
+
+tbl = tabulate(diff(tgrid));
+setopt.dt = tbl(tbl(:,3)>80,1); % find the timebin size
 
 
 % Compute P-GPLVM with Laplace Approximation

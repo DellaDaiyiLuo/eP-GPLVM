@@ -108,15 +108,23 @@ for iter = 1:niter
     for i=1:nf
         gridbound = [gridbound; min(xxsamp(:,i)) max(xxsamp(:,i))];
     end
-    xgrid = gen_grid(gridbound,ng,nf);
+
+    if setopt.ng_iter
+        ng_iter = min(ceil((iter+niter)*ng/niter/2),ng); % DL: starting from coarser grid ng/2
+        xgrid = gen_grid(gridbound,ng_iter,nf); % DL
+        disp(ng_iter)
+    else
+        xgrid = gen_grid(gridbound,ng,nf);
+    end
 
     %% 1. Find optimal ff
-     covfun = covariance_fun(rhoff,lenff,ffTYPE); % get the covariance function
-     cuu = covfun(xgrid,xgrid)+sigma2*eye(size(xgrid,1));
-     cuuinv = pdinv(cuu);
-     cufx = covfun(xgrid,xxsamp);
-     
-     lmlifun_poiss = @(ff) StateSpaceModelsofSpikeTrains(ff,yy,cufx,cuu,sigma2);
+
+    covfun = covariance_fun(rhoff,lenff,ffTYPE); % get the covariance function
+    cuu = covfun(xgrid,xgrid)+sigma2*eye(size(xgrid,1));
+    cuuinv = pdinv(cuu);
+    cufx = covfun(xgrid,xxsamp);
+    
+    lmlifun_poiss = @(ff) StateSpaceModelsofSpikeTrains(ff,yy,cufx,cuu,sigma2);
 
     
     switch ppTYPE
@@ -143,6 +151,8 @@ for iter = 1:niter
 %     subplot(412),plot([ff(:,20),exp(ffnew(:,20))]),title('exp(ff)'),legend('true ff','P-GPLVM ff'),drawnow
     
     %% 2. Find optimal latent xx, actually search in u space, xx=K^{1/2}*u
+
+
     [Bfun, BTfun, nu] = prior_kernel(rhoxx,lenxx,nt,latentTYPE,tgrid); % DL: using Cholesky decomposition to compute K^{1/2} and K^{1/2}.T, getting uu~N(0,1)
     uu = Bfun(xxsamp,1);
     cufx_old = covfun(xgrid,xxsamp);
@@ -244,6 +254,7 @@ for iter = 1:niter
         loghyp = log([rhoxx;lenxx;rhoff;lenff;sigma2]);
         loghyp = loghyp(hypid);
         lmlifun_hyp = @(loghyp) logmargli_gplvm_se_sor_hyp(loghyp,loghyp0,xxsamp,xgrid,latentTYPE,tgrid,nt,hypid,sigma2,ffmat,ffTYPE,sigma2);
+        % opts = optimset('largescale', 'off', 'maxiter', 1e1, 'display', 'off','DiffMaxChange',1); %DL
         opts = optimset('largescale', 'off', 'maxiter', 1e1, 'display', 'off');
         lb = [0;2.3;0;-3;-5]; % lower bound
         lb = lb(hypid);
