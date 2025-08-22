@@ -1,11 +1,9 @@
 # extended P-GPLVM
-Forked from LMT (latent manifold tuning model)
+Forked from LMT (latent manifold tuning model). The old name of the model is Poisson-Gaussian process latent variable model (P-GPLVM). 
 
-The old name of the model is Poisson-Gaussian process latent variable model (P-GPLVM). 
+**Description:** 
 
-**Description:** Estimate latent variables and tuning curves from spike train using P-GPLVM.
-
-Original P-GPLVM is as shown in
+Original P-GPLVM estimates latent variables and tuning curves from spike train using P-GPLVM, as shown in
 Gaussian process based nonlinear latent structure discovery in multivariate spike train data
 [Wu *et al* 2017](http://papers.nips.cc/paper/6941-gaussian-process-based-nonlinear-latent-structure-discovery-in-multivariate-spike-train-data).
 
