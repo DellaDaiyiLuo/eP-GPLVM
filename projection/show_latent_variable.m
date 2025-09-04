@@ -21,10 +21,9 @@ part = ii(input.Results.part);
 nf = size(xplot,2);
 hold on
 
-dt = min(round(diff(tgrid(part)'),2));
-tgrid = round(tgrid/dt);
-dt = round(diff(tgrid(part)'));
-d = [0 find(dt>1) numel(part)];
+tgrid = tgrid(:);
+dt = mode(diff(tgrid(part)));
+d = [0;find(round(diff(tgrid(part)),2)>dt+1e-4);numel(part)];
                 
 switch nf
     case 1

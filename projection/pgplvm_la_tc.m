@@ -83,25 +83,43 @@ options.Display = 'off';
 
 niter = setopt.niter;
 clf
-ng = 10;
+scatter3(xgrid(:,1),xgrid(:,2),xgrid(:,3),50,[.7,.7,.7],'filled','MarkerEdgeColor','None','MarkerFaceAlpha',0.2)
 llh = [];
+
+
+ng = 10;
+if p.Results.TCgrid
+    gridbound = [];
+    for i=1:nf
+        gridbound = [gridbound; min(xgrid(:,i)) max(xgrid(:,i))];
+    end
+    xgrid_ = gen_grid(gridbound,ng,nf);
+    fftc_ = get_tc(xgrid,fftc,xgrid_,rhoff,lenff);
+    disp('Grid TC')
+else
+    disp('Training TC')
+    xgrid_ = xgrid;
+    fftc_ = fftc;
+end
+
+
 for iter = 1:niter
     display(['iter' num2str(iter)])
     llh = [llh,comp_LLHtc(xxsamp, ffmat, xgrid, fftc, result, yy, tgrid)];
     display(['LLH: ' num2str(llh(end))])
-    if p.Results.TCgrid
-        gridbound = [];
-        for i=1:nf
-            gridbound = [gridbound; min(xxsamp(:,i)) max(xxsamp(:,i))];
-        end
-        xgrid_ = gen_grid(gridbound,ng,nf);
-        fftc_ = get_tc(xgrid,fftc,xgrid_,rhoff,lenff);
-        disp('Grid TC')
-    else
-        disp('Training TC')
-        xgrid_ = xgrid;
-        fftc_ = fftc;
-    end
+    % if p.Results.TCgrid
+    %     gridbound = [];
+    %     for i=1:nf
+    %         gridbound = [gridbound; min(xxsamp(:,i)) max(xxsamp(:,i))];
+    %     end
+    %     xgrid_ = gen_grid(gridbound,ng,nf);
+    %     fftc_ = get_tc(xgrid,fftc,xgrid_,rhoff,lenff);
+    %     disp('Grid TC')
+    % else
+    %     disp('Training TC')
+    %     xgrid_ = xgrid;
+    %     fftc_ = fftc;
+    % end
     %% 1. Find optimal ff
      covfun = covariance_fun(rhoff,lenff,ffTYPE); % get the covariance function
      cuu = covfun(xgrid_,xgrid_)+sigma2*eye(size(xgrid_,1));

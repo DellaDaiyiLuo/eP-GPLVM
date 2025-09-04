@@ -87,7 +87,7 @@ switch type
     case 'runrun' % no need to scale
         fftc = result_la.ffmat;
     case 'runpbe' % scale run tc
-        scaler(scaler==0) = min(nonzeros(scaler))/10;
+        % scaler(scaler==0) = min(nonzeros(scaler))/10;
         scale = log(scaler'); % (1,#neurons)
         fftc = result_la.ffmat+scale;
     case 'pberun' % scale run firing rate
@@ -135,6 +135,7 @@ setopt.ffmat = fftc_init(xinitidx,:);
 
 if niter ==0
     result.xxsamp = xinit;
+    result.llh = comp_LLHtc(xinit, fftc_init(xinitidx,:), result_la.xxsamp, fftc, result_la, yy, tgrid);
     setopt='none';
     fftc='none';
     order=xgrid_;
