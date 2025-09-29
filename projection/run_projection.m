@@ -131,7 +131,8 @@ fftc_init = get_tc(result_la.xxsamp,fftc,xgrid_,result_la.rhoff,result_la.lenff)
 loglikelihood = -repmat(sum(exp(fftc_init),2)',nt,1) + yy*fftc_init';
 [~, xinitidx] = max(loglikelihood,[],2);
 xinit = xgrid_(xinitidx,:);
-setopt.ffmat = fftc_init(xinitidx,:);
+% setopt.ffmat = fftc_init(xinitidx,:);
+ffmat = fftc_init(xinitidx,:);
 
 if niter ==0
     result.xxsamp = xinit;
@@ -148,12 +149,12 @@ else
     % run inference
     setopt.xpldsmat = []; %xppcamat;%[xx xx]; %  for plotting purpose
     setopt.initTYPE = 1; % initialize latent: 1. use PLDS init; 2. use random init; 3. true xx
-    switch setopt.initTYPE
-        case 1
-            setopt.xplds = xinit;% randn(nt,nf)*0.1;%%xppca;%[xx xx];% %for initialization purpose
-        case 2
-            setopt.xplds = [];
-    end
+    % switch setopt.initTYPE
+    %     case 1
+    %         setopt.xplds = xinit;% randn(nt,nf)*0.1;%%xppca;%[xx xx];% %for initialization purpose
+    %     case 2
+    %         setopt.xplds = [];
+    % end
 
     setopt.sigma2_init = p.Results.sigma; %2*power(0.95,30); % initial noise variance
 
@@ -164,7 +165,7 @@ else
     setopt.la_flag = 3; % 1. no la; 2. standard la; 3. decoupled la
 
     % same as inference
-    setopt.tgrid = tgrid; %[1:nt]';% ones(numel(xx)-1,1);%grid; %%double(idx)';
+    % setopt.tgrid = tgrid; %[1:nt]';% ones(numel(xx)-1,1);%grid; %%double(idx)';
     setopt.latentTYPE = 1; % kernel for the latent, 1. AR1 their method computing K^{-1/2}, 2. compute kernel then compute K^{-1/2}
     setopt.ffTYPE = 2; % kernel for the tuning curve, 1. AR1, 2. SE
     setopt.hypid = [1,2,3,4]; % 1. rho for Kxx; 2. len for Kxx; 3. rho for Kff; 4. len for Kff; 5. sigma2 (annealing it instead of optimizing it)
@@ -174,44 +175,34 @@ else
     % setopt.ffmat = sqrt(yy);%log(yy+1e-3);
     setopt.draw = p.Results.draw;
 
-    % %----use tc grid-----%
-    result = pgplvm_la_tc(yy,nf,setopt,xx,fftc,result_la.xxsamp,'TCgrid',p.Results.TCgrid);
-    % if p.Results.TCgrid
-    %     ng = 15;
-    %     gridbound = [];
-    %     for i=1:nf
-    %         gridbound = [gridbound; min(result_la.xxsamp(:,i)) max(result_la.xxsamp(:,i))];
-    %     end
-    %     xgrid = gen_grid(gridbound,ng,nf);
-    %     fftc_ = get_tc(result_la.xxsamp,fftc,xgrid,result_la.rhoff,result_la.lenff);
-    %     disp('Grid TC')
-    %     result = pgplvm_la_tc(yy,nf,setopt,xx,fftc_,xgrid); 
-    % else
-    %     disp('Training TC')
-    %     result = pgplvm_la_tc(yy,nf,setopt,xx,fftc,result_la.xxsamp);
-    % end
-    % %--------------------%
+    ffmat = zeros(size(yy));
+    xxsamp = zeros(size(yy,1),size(result_la.xxsamp,2));
+    llh = zeros(length(d)-1,niter);
+
+    for seg_id = 1:length(d)-1
+        seg_part = d(seg_id)+1:d(seg_id+1);
+        yy0 = yy(seg_part,:);
+        setopt.tgrid = tgrid(seg_part);
+        setopt.xplds = xinit(seg_part,:);
+        setopt.ffmat = ffmat(seg_part,:);
+    
+        fprintf('No.%d / %d segments\n',seg_id,length(d)-1)
+        result_ori = pgplvm_la_tc(yy0,nf,setopt,ones(size(seg_part(:))),fftc,result_la.xxsamp,'TCgrid',p.Results.TCgrid);
+        ffmat(seg_part,:) = result_ori.ffmat;
+        xxsamp(seg_part,:) = result_ori.xxsamp;
+        llh(seg_id,:) = result_ori.llh;
+    end
+
+    result = result_ori;
+    result.xxsamp = xxsamp;
+    result.ffmat = ffmat;
+    result.llh = llh;
+    setopt.tgrid = tgrid;
+    % result = pgplvm_la_tc(yy,nf,setopt,xx,fftc,result_la.xxsamp,'TCgrid',p.Results.TCgrid);
+
 
     logpy = [];%estimate_py(result, fftc, result_la.xxsamp, yy,tgrid,d)./diff(d(:)');
 
-    % if p.Results.givemeasure
-    %     
-    %     if p.Results.segmeasure
-    %             [speed_tc, ~] = get_speed(p.Results.tgrid_tc,result_la.xxsamp,0);
-    %             [stepdis, knndis, uniqueknn, spdcong,dircong,knnportion,sm] = projected_xx_measures_segs(result.xxsamp,p.Results.xbackground,d,tgrid,speed_tc,p.Results.draw,p.Results.k);
-    %             varargout={stepdis, knndis, uniqueknn, spdcong,dircong,knnportion,sm};
-    %     else
-    %         if isempty(p.Results.xbackground)
-    %             [stepdis, knndis, knnportion] = projected_xx_measures(result.xxsamp,{result_la.xxsamp},d,p.Results.draw,p.Results.k);
-    %         else
-    %             [stepdis, knndis, knnportion] = projected_xx_measures(result.xxsamp,p.Results.xbackground,d,p.Results.draw,p.Results.k);
-    %         end
-    %         varargout={stepdis, knndis, knnportion};
-    %     end
-
-    % else
-    %     varargout={};
-    % end
 end
 
 end

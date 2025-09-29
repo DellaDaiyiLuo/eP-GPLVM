@@ -27,7 +27,7 @@ setopt.latentTYPE = 1; % kernel for the latent variable, 1. AR1, 2. SE
 %% == 1. Compute baseline estimates ====
 
 % Initialize the log of spike rates with the square root of spike counts.
-ffmat = sqrt(yy);
+ffmat = sqrt(yy); %DL
 
 % Compute PPCA and show xx initialization
 if isempty(xppca)
@@ -60,8 +60,7 @@ setopt.hypid = [1,2,3,4]; % 1. rho for Kxx; 2. len for Kxx; 3. rho for Kff; 4. l
 setopt.niter = niter; % number of iterations
 setopt.ffmat = ffmat;
 
-tbl = tabulate(diff(tgrid));
-setopt.dt = tbl(tbl(:,3)>80,1); % find the timebin size
+setopt.dt = mode(diff(tgrid)); % find the timebin size
 
 
 % Compute P-GPLVM with Laplace Approximation

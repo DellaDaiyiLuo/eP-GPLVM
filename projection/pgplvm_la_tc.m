@@ -82,8 +82,10 @@ options.maxFunEvals = 1e1;
 options.Display = 'off';
 
 niter = setopt.niter;
-clf
-scatter3(xgrid(:,1),xgrid(:,2),xgrid(:,3),50,[.7,.7,.7],'filled','MarkerEdgeColor','None','MarkerFaceAlpha',0.2)
+if setopt.draw
+    clf
+    scatter3(xgrid(:,1),xgrid(:,2),xgrid(:,3),50,[.7,.7,.7],'filled','MarkerEdgeColor','None','MarkerFaceAlpha',0.2)
+end
 llh = [];
 
 
@@ -220,21 +222,22 @@ for iter = 1:niter
 %     xllh=[xllh,fval];
     
     % plot latent xx
-    hold on
+    
         if setopt.draw
-        switch nf
-            case 1
-                xxsampmat = align_xtrue(xxsamp,xx);
-                subplot(212); plot(1:nt,xx,'b-',1:nt,xpldsmat,'m.-',1:nt,xxsampmat,'k-',1:nt,xxsampmat_old,'k:','linewidth',2); legend('true x','init x','P-GPLVM x','P-GPLVM old x');
-                xlabel('time bin'); drawnow;
-                xxsampmat_old = xxsampmat;
-            case 2
-                scatter(xxsamp(:,1),xxsamp(:,2),3,'MarkerEdgeColor',[1/niter*iter,0,0]); drawnow;
-            case 3
-                show_latent_variable(xxsamp,xx,[],tgrid,'line_only',1,'line_color',[1/niter*iter,0,0])
-%                 scatter3(xxsamp(:,1),xxsamp(:,2),xxsamp(:,3),3,'MarkerEdgeColor',[1/niter*iter,0,0]); 
-                drawnow;
-        end
+            hold on
+            switch nf
+                case 1
+                    xxsampmat = align_xtrue(xxsamp,xx);
+                    subplot(212); plot(1:nt,xx,'b-',1:nt,xpldsmat,'m.-',1:nt,xxsampmat,'k-',1:nt,xxsampmat_old,'k:','linewidth',2); legend('true x','init x','P-GPLVM x','P-GPLVM old x');
+                    xlabel('time bin'); drawnow;
+                    xxsampmat_old = xxsampmat;
+                case 2
+                    scatter(xxsamp(:,1),xxsamp(:,2),3,'MarkerEdgeColor',[1/niter*iter,0,0]); drawnow;
+                case 3
+                    show_latent_variable(xxsamp,xx,[],tgrid,'line_only',1,'line_color',[1/niter*iter,0,0])
+    %                 scatter3(xxsamp(:,1),xxsamp(:,2),xxsamp(:,3),3,'MarkerEdgeColor',[1/niter*iter,0,0]); 
+                    drawnow;
+            end
         end
 
 %     logpy = [logpy,sum(estimate_py(result, fftc_, xgrid_, yy,tgrid,d))];
