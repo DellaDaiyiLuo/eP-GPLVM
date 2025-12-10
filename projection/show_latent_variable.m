@@ -1,4 +1,4 @@
-function show_latent_variable(xplot,xcolor,xbackground,tgrid,varargin)
+function [p,label] = show_latent_variable(xplot,xcolor,xbackground,tgrid,varargin)
 % nf: scalar, latent variable dimensions
 % xplot: (nt,nf) matrix, latent variable to be plotted
 % xcolor: (nt,1) matrix, color indices for xplot, usually true animal position
@@ -23,7 +23,7 @@ hold on
 
 tgrid = tgrid(:);
 dt = mode(diff(tgrid(part)));
-d = [0;find(round(diff(tgrid(part)),2)>dt+1e-4);numel(part)];
+d = [0;find(round(diff(tgrid(part)),3)>dt+1e-4);numel(part)];
                 
 switch nf
     case 1
@@ -78,6 +78,7 @@ switch nf
                 color = input.Results.line_color;
                 for i=1:numel(d)-1
                     p1=plot3(xplot(d(i)+1:d(i+1),1),xplot(d(i)+1:d(i+1),2),xplot(d(i)+1:d(i+1),3),'Color',color,'LineWidth',.5);
+                    % p1=plot3(xplot(d(i)+1:d(i+1),1),xplot(d(i)+1:d(i+1),2),xplot(d(i)+1:d(i+1),3),'Marker','.','Color',color,'LineWidth',.5);
                 end
                 p = [p,p1];
                 label = [label,{'trajectory'}];

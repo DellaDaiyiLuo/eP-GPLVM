@@ -62,6 +62,12 @@ switch p.Results.shuffle
         xx = xx0(order);
     case 'cir'
         yy = zeros(size(yy0));
+        % % maxshift = round(nt/10);
+        % % for i = 1:size(yy0,2)
+        % %     r = ceil(rand * maxshift);
+        % %     tmpseg = repmat(yy0(:,i),2,1);
+        % %     yy(:,i) = tmpseg([1:nt]+r);
+        % % end
         len = diff(d);
         for i = 1:size(yy0,2)
             for j = 1:numel(len)

@@ -234,7 +234,7 @@ for iter = 1:niter
                 case 2
                     scatter(xxsamp(:,1),xxsamp(:,2),3,'MarkerEdgeColor',[1/niter*iter,0,0]); drawnow;
                 case 3
-                    show_latent_variable(xxsamp,xx,[],tgrid,'line_only',1,'line_color',[1/niter*iter,0,0])
+                    show_latent_variable(xxsamp,xx,[],tgrid,'line_only',1,'line_color',[1/niter*iter,0,0]);
     %                 scatter3(xxsamp(:,1),xxsamp(:,2),xxsamp(:,3),3,'MarkerEdgeColor',[1/niter*iter,0,0]); 
                     drawnow;
             end

@@ -27,11 +27,11 @@ setopt.latentTYPE = 1; % kernel for the latent variable, 1. AR1, 2. SE
 %% == 1. Compute baseline estimates ====
 
 % Initialize the log of spike rates with the square root of spike counts.
-ffmat = sqrt(yy); %DL
+ffmat = sqrt(yy)/2; %DL
 
 % Compute PPCA and show xx initialization
 if isempty(xppca)
-    xppca = pca(ffmat,nf);
+    xppca = pca1(ffmat,nf);
 end
 setopt.xplds = xppca;% for initialization purpose
 
