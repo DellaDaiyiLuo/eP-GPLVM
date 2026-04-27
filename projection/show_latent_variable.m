@@ -11,7 +11,7 @@ input = inputParser;
 addParameter(input,'part',1:size(xplot,1))
 addParameter(input,'scatter_only',0)
 addParameter(input,'line_only',0)
-addParameter(input,'line_color',[0.7,0.5,0.5])
+addParameter(input,'line_color',[0.7,0.7,0.7])
 addParameter(input,'legend',1)
 parse(input,varargin{:});
 
@@ -47,7 +47,7 @@ switch nf
             if ~input.Results.scatter_only
                 color = input.Results.line_color;
                 for i=1:numel(d)-1
-                    p1=plot(xplot(d(i)+1:d(i+1),1),xplot(d(i)+1:d(i+1),2),'Color',color);
+                    p1=plot(xplot(d(i)+1:d(i+1),1),xplot(d(i)+1:d(i+1),2),'-','Marker','.','Color',color);
                 end
                 p = [p p1];
                 label = [label, {'trajectory'}];
@@ -77,7 +77,7 @@ switch nf
             if ~input.Results.scatter_only
                 color = input.Results.line_color;
                 for i=1:numel(d)-1
-                    p1=plot3(xplot(d(i)+1:d(i+1),1),xplot(d(i)+1:d(i+1),2),xplot(d(i)+1:d(i+1),3),'Color',color,'LineWidth',.5);
+                    p1=plot3(xplot(d(i)+1:d(i+1),1),xplot(d(i)+1:d(i+1),2),xplot(d(i)+1:d(i+1),3),'Color',color,'LineWidth',1);
                     % p1=plot3(xplot(d(i)+1:d(i+1),1),xplot(d(i)+1:d(i+1),2),xplot(d(i)+1:d(i+1),3),'Marker','.','Color',color,'LineWidth',.5);
                 end
                 p = [p,p1];

@@ -1,4 +1,5 @@
 function postm = get_tc(xx,ffmat,xgrid,rhoff,lenff)
+% Compute the F of xgrid based on xx and ffmat
 
 ffTYPE = 2;
 covfun = covariance_fun(rhoff,lenff,ffTYPE); % get the covariance function
